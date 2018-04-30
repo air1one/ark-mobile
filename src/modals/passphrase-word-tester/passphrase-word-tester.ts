@@ -13,7 +13,7 @@ export class PassphraseWordTesterModal {
 
   public words: PassphraseWord[] = [];
   public isDevNet: boolean;
-  public wordSuggestions = [];
+  public wordSuggestions = [[],[],[]];
 
   private wordlistLanguage: string;
 
@@ -46,27 +46,19 @@ export class PassphraseWordTesterModal {
 
   wordChange(value, wordIndex) {
     this.words[wordIndex].userValue = value;
-    this.suggestWord(value);
+    this.suggestWord(value, wordIndex);
   }
 
-  suggestWord(wordInput) {
-    this.wordSuggestions = [];
+  suggestWord(wordInput, wordIndex) {
+    this.wordSuggestions = [[],[],[]];
     if (wordInput.length < 2) { return; }
 
     const wordlist = bip39.wordlists[this.wordlistLanguage || 'english'];
-    this.wordSuggestions = wordlist.filter( word => word.indexOf(wordInput) === 0 );
+    this.wordSuggestions[wordIndex] = wordlist.filter( word => word.indexOf(wordInput) === 0 );
   }
 
-  wordBlur(event, wordIndex) {
-    if (!event.relatedTarget) { return; }
-    const relatedName = event.relatedTarget.name;
-    if (!relatedName || relatedName.indexOf('wordSuggestion') === -1) { return; }
-
-    const index = parseInt(relatedName[relatedName.length - 1]); // 0,1 or 2 from wordSuggestion0,1,2
-    if (isNaN(index)) { return; }
-
-    this.words[wordIndex].userValue = this.wordSuggestions[index];
-
-    this.wordSuggestions = [];
+  suggestionClick(wordIndex, suggestionIndex) {
+    this.words[wordIndex].userValue = this.wordSuggestions[wordIndex][suggestionIndex];
+    this.wordSuggestions = [[],[],[]];
   }
 }
